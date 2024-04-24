@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">My MVVM</string>
+    <string name="no_internet">Kindly check your network</string>
+</resources>
