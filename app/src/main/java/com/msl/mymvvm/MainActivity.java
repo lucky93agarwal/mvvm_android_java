@@ -12,8 +12,11 @@ import android.widget.ProgressBar;
 
 import com.msl.mymvvm.adapter.UserAdapter;
 import com.msl.mymvvm.model.User;
+import com.msl.mymvvm.repository.UserRepository;
+import com.msl.mymvvm.repository.UserRepositoryImpl;
 import com.msl.mymvvm.utils.Utilities;
 import com.msl.mymvvm.viewModel.UserViewModel;
+import com.msl.mymvvm.viewModel.UserViewModelFactory;
 
 import java.util.List;
 
@@ -28,14 +31,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerView = findViewById(R.id.recyclerView);
-        progressBar = findViewById(R.id.progressBar);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        userAdapter = new UserAdapter();
-        recyclerView.setAdapter(userAdapter);
-        rootView = findViewById(android.R.id.content);
 
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        init();
+
+
+
         if (Utilities.isNetworkAvailable(this)){
             userViewModel.getUsers().observe(this, new Observer<List<User>>() {
                 @Override
@@ -49,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
                     progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
                 }
             });
-        }else{
+        }
+        else{
             progressBar.setVisibility(View.GONE);
             Utilities.showSnackBar(rootView,getString(R.string.no_internet));
         }
@@ -57,5 +58,19 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void init(){
+        recyclerView = findViewById(R.id.recyclerView);
+        progressBar = findViewById(R.id.progressBar);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        userAdapter = new UserAdapter();
+        recyclerView.setAdapter(userAdapter);
+        rootView = findViewById(android.R.id.content);
+
+
+        // repository
+        UserRepository userRepository = new UserRepositoryImpl(this);
+        userViewModel = new ViewModelProvider(this, new UserViewModelFactory(userRepository,this)).get(UserViewModel.class);
     }
 }
